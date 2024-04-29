@@ -3,10 +3,15 @@ import java.io.*;
 public class FileSearchWithoutParallelism {
 
     public static void main(String[] args) {
-        File directory = new File("/home/gustavo/Área de Trabalho/dataset_p"); // Define o caminho do diretório
+        File directory = new File("/home/gustavo/Área de Trabalho/dataset_g"); // Define o caminho do diretório
         String searchTerm = "Sandy"; // Define o termo de busca
 
+        long startTime = System.currentTimeMillis(); // Inicia a medição do tempo
+
         searchFiles(directory, searchTerm);
+
+        long endTime = System.currentTimeMillis(); // Encerra a medição do tempo
+        System.out.println("Tempo de execução: " + (endTime - startTime) + " ms");
     }
 
     private static void searchFiles(File dir, String searchTerm) {
@@ -30,7 +35,6 @@ public class FileSearchWithoutParallelism {
             searchInFile(file, searchTerm);
         }
     }
-
 
     private static void searchInFile(File file, String searchTerm) {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {

@@ -4,15 +4,29 @@ import java.util.concurrent.*;
 public class FileSearchWithParallelism {
 
     public static void main(String[] args) {
-        File directory = new File("/home/gustavo/Área de Trabalho/dataset_p"); // Defina o caminho do diretório
+        File directory = new File("/home/gustavo/Área de Trabalho/dataset_g"); // Defina o caminho do diretório
         String searchTerm = "Sandy"; // Defina o termo de busca
         ExecutorService executor = Executors.newFixedThreadPool(4);
+
+        long startTime = System.currentTimeMillis(); // Inicia a medição do tempo
 
         try {
             searchFiles(directory, searchTerm, executor);
         } finally {
             executor.shutdown();
+            try {
+                // Aguarda até que todas as tarefas sejam finalizadas ou até o tempo máximo de 1 dia
+                if (!executor.awaitTermination(1, TimeUnit.DAYS)) {
+                    executor.shutdownNow(); // Cancela as tarefas em execução
+                }
+            } catch (InterruptedException e) {
+                executor.shutdownNow(); // Cancela as tarefas em execução se o await foi interrompido
+                Thread.currentThread().interrupt(); // Restaura o status de interrupção
+            }
         }
+
+        long endTime = System.currentTimeMillis(); // Encerra a medição do tempo
+        System.out.println("Tempo de execução: " + (endTime - startTime) + " ms");
     }
 
     private static void searchFiles(File dir, String searchTerm, ExecutorService executor) {
