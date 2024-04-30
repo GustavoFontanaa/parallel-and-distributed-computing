@@ -1,17 +1,19 @@
 import java.io.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FileSearchWithParallelism {
 
     public static void main(String[] args) {
-        File directory = new File("/home/gustavo/Área de Trabalho/dataset_g"); // Defina o caminho do diretório
+        File directory = new File("/home/gustavo/Área de Trabalho/dataset_p"); // Defina o caminho do diretório
         String searchTerm = "Sandy"; // Defina o termo de busca
         ExecutorService executor = Executors.newFixedThreadPool(4);
+        AtomicInteger totalFound = new AtomicInteger(0); // Inicializa o contador atômico
 
         long startTime = System.currentTimeMillis(); // Inicia a medição do tempo
 
         try {
-            searchFiles(directory, searchTerm, executor);
+            searchFiles(directory, searchTerm, executor, totalFound);
         } finally {
             executor.shutdown();
             try {
@@ -27,9 +29,10 @@ public class FileSearchWithParallelism {
 
         long endTime = System.currentTimeMillis(); // Encerra a medição do tempo
         System.out.println("Tempo de execução: " + (endTime - startTime) + " ms");
+        System.out.println("Total de termos '" + searchTerm + "' encontrados: " + totalFound.get());
     }
 
-    private static void searchFiles(File dir, String searchTerm, ExecutorService executor) {
+    private static void searchFiles(File dir, String searchTerm, ExecutorService executor, AtomicInteger totalFound) {
         if (!dir.exists()) {
             System.out.println("O diretório não existe: " + dir.getAbsolutePath());
             return;
@@ -49,7 +52,8 @@ public class FileSearchWithParallelism {
         for (File file : files) {
             executor.execute(() -> {
                 try {
-                    searchInFile(file, searchTerm);
+                    int foundCount = searchInFile(file, searchTerm);
+                    totalFound.addAndGet(foundCount); // Adiciona a contagem encontrada ao total
                 } catch (Exception e) {
                     System.out.println("Erro ao processar o arquivo " + file.getName() + ": " + e.getMessage());
                 }
@@ -57,7 +61,8 @@ public class FileSearchWithParallelism {
         }
     }
 
-    private static void searchInFile(File file, String searchTerm) {
+    private static int searchInFile(File file, String searchTerm) {
+        int count = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             int lineNumber = 0;
@@ -65,10 +70,12 @@ public class FileSearchWithParallelism {
                 lineNumber++;
                 if (line.contains(searchTerm)) {
                     System.out.printf("Termo '%s' encontrado em %s na linha %d%n", searchTerm, file.getName(), lineNumber);
+                    count++;
                 }
             }
         } catch (IOException e) {
             System.out.println("Erro ao ler o arquivo: " + file.getName());
         }
+        return count;
     }
 }

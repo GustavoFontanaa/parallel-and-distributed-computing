@@ -3,40 +3,44 @@ import java.io.*;
 public class FileSearchWithoutParallelism {
 
     public static void main(String[] args) {
-        File directory = new File("/home/gustavo/Área de Trabalho/dataset_g"); // Define o caminho do diretório
+        File directory = new File("/home/gustavo/Área de Trabalho/dataset_p"); // Define o caminho do diretório
         String searchTerm = "Sandy"; // Define o termo de busca
 
         long startTime = System.currentTimeMillis(); // Inicia a medição do tempo
 
-        searchFiles(directory, searchTerm);
+        int totalFound = searchFiles(directory, searchTerm); // Retorna o total de termos encontrados
 
         long endTime = System.currentTimeMillis(); // Encerra a medição do tempo
         System.out.println("Tempo de execução: " + (endTime - startTime) + " ms");
+        System.out.println("Total de termos '" + searchTerm + "' encontrados: " + totalFound);
     }
 
-    private static void searchFiles(File dir, String searchTerm) {
+    private static int searchFiles(File dir, String searchTerm) {
+        int totalCount = 0;
         if (!dir.exists()) {
             System.out.println("O diretório não existe: " + dir.getAbsolutePath());
-            return;
+            return totalCount;
         }
 
         if (!dir.isDirectory()) {
             System.out.println("O caminho especificado não é um diretório: " + dir.getAbsolutePath());
-            return;
+            return totalCount;
         }
 
         File[] files = dir.listFiles((_, name) -> name.endsWith(".txt"));
         if (files == null) {
             System.out.println("Não foi possível ler os arquivos do diretório ou não há arquivos .txt: " + dir.getAbsolutePath());
-            return;
+            return totalCount;
         }
 
         for (File file : files) {
-            searchInFile(file, searchTerm);
+            totalCount += searchInFile(file, searchTerm);
         }
+        return totalCount;
     }
 
-    private static void searchInFile(File file, String searchTerm) {
+    private static int searchInFile(File file, String searchTerm) {
+        int count = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             int lineNumber = 0;
@@ -44,10 +48,12 @@ public class FileSearchWithoutParallelism {
                 lineNumber++;
                 if (line.contains(searchTerm)) {
                     System.out.printf("Termo '%s' encontrado em %s na linha %d%n", searchTerm, file.getName(), lineNumber);
+                    count++;
                 }
             }
         } catch (IOException e) {
             System.out.println("Erro ao ler o arquivo: " + file.getName());
         }
+        return count;
     }
 }
