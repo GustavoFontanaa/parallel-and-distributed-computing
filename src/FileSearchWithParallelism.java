@@ -5,9 +5,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FileSearchWithParallelism {
 
     public static void main(String[] args) {
-        File directory = new File("/home/gustavo/Área de Trabalho/dataset_p"); // Defina o caminho do diretório
-        String searchTerm = "Sandy"; // Defina o termo de busca
-        ExecutorService executor = Executors.newFixedThreadPool(4);
+        File directory = new File("/home/gustavo/Área de Trabalho/parallel-and-distributed-computing/dataset_p"); // Defina o caminho do diretório
+        String searchTerm = "Jon"; // Defina o termo de busca
+        //dataset_g
+        //Jon
+        //Andrew
+        //Kent
+
+        //dataset_p
+        //Jon
+        //Michelle
+        //Laura
+        ExecutorService executor = Executors.newFixedThreadPool(2);
         AtomicInteger totalFound = new AtomicInteger(0); // Inicializa o contador atômico
 
         long startTime = System.currentTimeMillis(); // Inicia a medição do tempo

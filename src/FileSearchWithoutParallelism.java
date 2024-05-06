@@ -3,8 +3,18 @@ import java.io.*;
 public class FileSearchWithoutParallelism {
 
     public static void main(String[] args) {
-        File directory = new File("/home/gustavo/Área de Trabalho/dataset_p"); // Define o caminho do diretório
-        String searchTerm = "Sandy"; // Define o termo de busca
+        File directory = new File("/home/gustavo/Área de Trabalho/parallel-and-distributed-computing/dataset_p"); // Define o caminho do diretório
+        String searchTerm = "Laura"; // Define o termo de busca
+
+        //dataset_g
+        //Jon
+        //Andrew
+        //Kent
+
+        //dataset_p
+        //Jon
+        //Michelle
+        //Laura
 
         long startTime = System.currentTimeMillis(); // Inicia a medição do tempo
 
